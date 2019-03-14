@@ -457,6 +457,10 @@ for (int i = 0; i < 10000; ++i) {
 
 - 链表中环的检测
 
+- ```java
+  
+  ```
+
 - 两个有序的链表合并
 
 - 删除链表倒数第 n 个结点
@@ -464,4 +468,50 @@ for (int i = 0; i < 10000; ++i) {
 - 求链表的中间结点
 
 
+
+### 08 栈：如何实现浏览器的前进和后退功能？
+
+
+
+栈是一种操作受限的线性表，只允许在一端插入和删除数据。
+
+- 用数组实现的栈，叫顺序栈
+- 用链表实现的栈，叫链式栈
+
+```java
+// 基于数组实现的顺序栈
+public class ArrayStack {
+  private String[] items;  // 数组
+  private int count;       // 栈中元素个数
+  private int n;           // 栈的大小
+
+  // 初始化数组，申请一个大小为 n 的数组空间
+  public ArrayStack(int n) {
+    this.items = new String[n];
+    this.n = n;
+    this.count = 0;
+  }
+
+  // 入栈操作
+  public boolean push(String item) {
+    // 数组空间不够了，直接返回 false，入栈失败。
+    if (count == n) return false;
+    // 将 item 放到下标为 count 的位置，并且 count 加一
+    items[count] = item;
+    ++count;
+    return true;
+  }
+  
+  // 出栈操作
+  public String pop() {
+    // 栈为空，则直接返回 null
+    if (count == 0) return null;
+    // 返回下标为 count-1 的数组元素，并且栈中元素个数 count 减一
+    String tmp = items[count-1];
+    --count;
+    return tmp;
+  }
+}
+
+```
 
