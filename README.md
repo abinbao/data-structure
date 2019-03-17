@@ -515,3 +515,145 @@ public class ArrayStack {
 
 ```
 
+
+
+### 09 队列：队列在线程池等有限资源池中的应用
+
+
+
+#### 如何理解“队列”？
+
+队列是一种操作受限的线性表数据结构。
+
+
+
+- 循环队列
+- 阻塞队列
+- 并发队列 
+
+**Disruptor、Linux 环形缓存** 循环并发队列。
+
+**Java concurrent** 并发包利用 **ArrayBlockingQueue** 实现公平锁。
+
+
+
+#### 顺序队列和链式队列
+
+先进先出
+
+队尾插入，队头删除
+
+用数组实现的队列叫做顺序队列，用链表实现的队列叫做链式队列
+
+```java
+// 用数组实现的队列
+public class ArrayQueue {
+  // 数组：items，数组大小：n
+  private String[] items;
+  private int n = 0;
+  // head 表示队头下标，tail 表示队尾下标
+  private int head = 0;
+  private int tail = 0;
+
+  // 申请一个大小为 capacity 的数组
+  public ArrayQueue(int capacity) {
+    items = new String[capacity];
+    n = capacity;
+  }
+
+  // 入队
+  public boolean enqueue(String item) {
+    // 如果 tail == n 表示队列已经满了
+    if (tail == n) return false;
+    items[tail] = item;
+    ++tail;
+    return true;
+  }
+
+  // 出队
+  public String dequeue() {
+    // 如果 head == tail 表示队列为空
+    if (head == tail) return null;
+    // 为了让其他语言的同学看的更加明确，把 -- 操作放到单独一行来写了
+    String ret = items[head];
+    ++head;
+    return ret;
+  }
+}
+
+```
+
+**数据搬移**
+
+**基于链表的队列实现方法**
+
+
+
+**循环队列**
+
+```java
+public class CircularQueue {
+  // 数组：items，数组大小：n
+  private String[] items;
+  private int n = 0;
+  // head 表示队头下标，tail 表示队尾下标
+  private int head = 0;
+  private int tail = 0;
+
+  // 申请一个大小为 capacity 的数组
+  public CircularQueue(int capacity) {
+    items = new String[capacity];
+    n = capacity;
+  }
+
+  // 入队
+  public boolean enqueue(String item) {
+    // 队列满了
+    if ((tail + 1) % n == head) return false;
+    items[tail] = item;
+    tail = (tail + 1) % n;
+    return true;
+  }
+
+  // 出队
+  public String dequeue() {
+    // 如果 head == tail 表示队列为空
+    if (head == tail) return null;
+    String ret = items[head];
+    head = (head + 1) % n;
+    return ret;
+  }
+}
+```
+
+
+
+**阻塞队列和并发队列**
+
+- 阻塞队列 生产者和消费者模型
+- 并发队列 线程安全的队列  CAS 原子操作
+
+
+
+线程池没有空闲线程时，新的任务请求线程资源时，线程池该如何处理？各种处理策略又是如何实现的呢？
+
+**两种处理策略**
+
+- 非阻塞的处理方式，直接拒绝任务请求
+- 阻塞方式，将请求排队，等到有空闲线程时，取出排队的请求继续处理。
+
+如何存储排队的请求呢？
+
+队列来存储排队请求。
+
+- 基于链表的实现方式，可以实现一个支持无线排队的无界队列，但是可能导致过多的请求排队等待，请求处理的响应时间过长。所以，针对响应时间比较敏感的系统，基于链表实现的无限排队的线程池是不合适的。
+- 基于数组实现的有界队列，队列的大小有限，所以线程池中排队的请求超过队列大小时，接下来的请求就会被拒绝，这种方式对响应时间敏感的系统来说，就相对更加合理。
+
+
+
+
+
+
+
+
+
