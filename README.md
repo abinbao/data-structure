@@ -651,6 +651,36 @@ public class CircularQueue {
 
 
 
+### 10 递归：如何用三行大吗找到“最终推荐人”？
+
+- 动态规划
+- 递归
+  - DFS 深度优先搜索
+  - 前中后序二叉树遍历
+
+
+
+#### 递归需要满足的三个条件
+
+1. 一个问题的解可以分解为几个子问题的解
+2. 这个问题与分解之后的子问题，除了数据规模不同，求解思路完全一样
+3. 存在递归终止条件
+
+
+
+- 堆栈溢出  设置深度 depth
+- 重复计算 散列表保存已经计算好的值
+
+```java
+long findRootReferrerId(long actorId) {
+  Long referrerId = select referrer_id from [table] where actor_id = actorId;
+  if (referrerId == null) return actorId;
+  return findRootReferrerId(referrerId);
+}
+```
+
+
+
 
 
 
