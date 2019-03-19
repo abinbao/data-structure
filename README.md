@@ -681,9 +681,235 @@ long findRootReferrerId(long actorId) {
 
 
 
+### 11 排序（上）：为什么插入排序比冒泡排序更受欢迎？
+
+- 猴子排序
+- 睡眠排序
+- 面条排序
+- 冒泡排序
+- 插入排序
+- 选择排序
+- 归并排序
+- 快速排序
+- 计数排序
+- 基数排序
+- 桶排序
+
+![fb8394a588b12ff6695cfd664afb17cd](./fb8394a588b12ff6695cfd664afb17cd.jpg)
 
 
 
+#### 如何分析一个“排序算法”
+
+**排序算法的执行效率**
+
+- 最好情况、最坏情况、平均情况时间复杂度
+- 时间复杂度的系数、常数、低阶
+- 比较次数和交换（或者移动）次数
+
+**排序算法的内存消耗**
+
+算法的内存消耗可以通过空间复杂度来衡量。
+
+**原地排序**，特指空间复杂度是O(1)的排序算法。
+
+**排序算法的稳定性**
 
 
+
+#### 冒泡排序
+
+```java
+// 冒泡排序，a 表示数组，n 表示数组大小
+public void bubbleSort(int[] a, int n) {
+  if (n <= 1) return;
+ 
+ for (int i = 0; i < n; ++i) {
+    // 提前退出冒泡循环的标志位
+    boolean flag = false;
+    for (int j = 0; j < n - i - 1; ++j) {
+      if (a[j] > a[j+1]) { // 交换
+        int tmp = a[j];
+        a[j] = a[j+1];
+        a[j+1] = tmp;
+        flag = true;  // 表示有数据交换      
+      }
+    }
+    if (!flag) break;  // 没有数据交换，提前退出
+  }
+}
+```
+
+
+
+**1. 冒泡排序是原地排序算法吗？**
+
+**2. 冒泡排序是稳定的排序算法吗？**
+
+**3. 冒泡排序的时间复杂度是多少？**
+
+**有序度**
+
+#### 插入排序
+
+```java
+// 插入排序，a 表示数组，n 表示数组大小
+public void insertionSort(int[] a, int n) {
+  if (n <= 1) return;
+
+  for (int i = 1; i < n; ++i) {
+    int value = a[i];
+    int j = i - 1;
+    // 查找插入的位置
+    for (; j >= 0; --j) {
+      if (a[j] > value) {
+        a[j+1] = a[j];  // 数据移动
+      } else {
+        break;
+      }
+    }
+    a[j+1] = value; // 插入数据
+  }
+}
+```
+
+
+
+**1. 插入排序是原地排序算法吗？**
+
+**2. 插入排序是稳定的排序算法吗？**
+
+**3. 插入排序的时间复杂度是多少？**
+
+#### 选择排序
+
+
+
+冒泡排序和插入排序的时间复杂度都是 O(n2)，都是原地排序。
+
+
+
+### 12 排序（下）：如何使用快排思想在O(n)内查找第 K 大元素？
+
+**O(n2)**
+
+- 冒泡排序
+- 插入排序
+- 选择排序
+
+**nlogn**
+
+- 归并排序
+- 快速排序
+
+分治思想
+
+#### 归并排序
+
+如果要排序一个数组，我们先把数组从中间分成前后两部分，然后对前后两部分分别排序，在将排好序的两部分合并在一起。
+
+```java
+递推公式：
+merge_sort(p…r) = merge(merge_sort(p…q), merge_sort(q+1…r))
+
+终止条件：
+p >= r 不用再继续分解
+```
+
+```java
+// 归并排序算法, A 是数组，n 表示数组大小
+merge_sort(A, n) {
+  merge_sort_c(A, 0, n-1)
+}
+
+// 递归调用函数
+merge_sort_c(A, p, r) {
+  // 递归终止条件
+  if p >= r  then return
+
+  // 取 p 到 r 之间的中间位置 q
+  q = (p+r) / 2
+  // 分治递归
+  merge_sort_c(A, p, q)
+  merge_sort_c(A, q+1, r)
+  // 将 A[p...q] 和 A[q+1...r] 合并为 A[p...r]
+  merge(A[p...r], A[p...q], A[q+1...r])
+}
+
+```
+
+```java
+merge(A[p...r], A[p...q], A[q+1...r]) {
+  var i := p，j := q+1，k := 0 // 初始化变量 i, j, k
+  var tmp := new array[0...r-p] // 申请一个大小跟 A[p...r] 一样的临时数组
+  while i<=q AND j<=r do {
+    if A[i] <= A[j] {
+      tmp[k++] = A[i++] // i++ 等于 i:=i+1
+    } else {
+      tmp[k++] = A[j++]
+    }
+  }
+  
+  // 判断哪个子数组中有剩余的数据
+  var start := i，end := q
+  if j<=r then start := j, end:=r
+  
+  // 将剩余的数据拷贝到临时数组 tmp
+  while start <= end do {
+    tmp[k++] = A[start++]
+  }
+  
+  // 将 tmp 中的数组拷贝回 A[p...r]
+  for i:=0 to r-p do {
+    A[p+i] = tmp[i]
+  }
+}
+```
+
+
+
+#### 快速排序的原理
+
+如果要排序数组中下标 P 到 R 之间的一组数据，我们选择 P 到 R 之间的任意一个数据作为 PIVOT（分区点）
+
+```java
+递推公式：
+quick_sort(p…r) = quick_sort(p…q-1) + quick_sort(q+1, r)
+
+终止条件：
+p >= r
+```
+
+
+
+```java
+// 快速排序，A 是数组，n 表示数组的大小
+quick_sort(A, n) {
+  quick_sort_c(A, 0, n-1)
+}
+// 快速排序递归函数，p,r 为下标
+quick_sort_c(A, p, r) {
+  if p >= r then return
+  
+  q = partition(A, p, r) // 获取分区点
+  quick_sort_c(A, p, q-1)
+  quick_sort_c(A, q+1, r)
+}
+```
+
+
+
+```java
+partition(A, p, r) {
+  pivot := A[r]
+  i := p
+  for j := p to r-1 do {
+    if A[j] < pivot {
+      swap A[i] with A[j]
+      i := i+1
+    }
+  }
+  swap A[i] with A[r]
+  return i
+```
 
