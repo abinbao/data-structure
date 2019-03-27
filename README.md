@@ -913,3 +913,451 @@ partition(A, p, r) {
   return i
 ```
 
+
+
+### 13 线性排序：如何根据年龄给100万用户数据排序？
+
+- 常用排序算法的原理
+- 时间复杂度
+- 空间复杂度
+- 稳定性
+
+
+
+**线性排序**
+
+- 桶排序
+- 计数排序
+- 基数排序
+
+
+
+#### 桶排序
+
+桶排序比较适合用在外部排序中。外部排序是指数据存储在外部磁盘中，数据量比较大，内存邮箱，无法将数据全部加载到内存中。
+
+
+
+#### 计数排序
+
+计数排序其实是桶排序的一种特殊情况。当要排序的n个数据，所处的范围并不大的时候，比如最大值是k，我们就可以把数据划分成 k 个桶。没个桶内的数据值都是相同的，省掉了桶内排序的时间。
+
+```java
+// 计数排序，a 是数组，n 是数组大小。假设数组中存储的都是非负整数。
+public void countingSort(int[] a, int n) {
+  if (n <= 1) return;
+
+  // 查找数组中数据的范围
+  int max = a[0];
+  for (int i = 1; i < n; ++i) {
+    if (max < a[i]) {
+      max = a[i];
+    }
+  }
+
+  int[] c = new int[max + 1]; // 申请一个计数数组 c，下标大小 [0,max]
+  for (int i = 0; i <= max; ++i) {
+    c[i] = 0;
+  }
+
+  // 计算每个元素的个数，放入 c 中
+  for (int i = 0; i < n; ++i) {
+    c[a[i]]++;
+  }
+
+  // 依次累加
+  for (int i = 1; i <= max; ++i) {
+    c[i] = c[i-1] + c[i];
+  }
+
+  // 临时数组 r，存储排序之后的结果
+  int[] r = new int[n];
+  // 计算排序的关键步骤，有点难理解
+  for (int i = n - 1; i >= 0; --i) {
+    int index = c[a[i]]-1;
+    r[index] = a[i];
+    c[a[i]]--;
+  }
+
+  // 将结果拷贝给 a 数组
+  for (int i = 0; i < n; ++i) {
+    a[i] = r[i];
+  }
+}
+```
+
+**计数排序只能用在范围不大的场景中，如果数据范围k比要排序的数据n大很多，就不适用计数排序了。而且，计数排序只能给非负整数排序，如果要排序的是其他类型的，要将其在不改变相对大小的情况下，转化为非负整数。**
+
+#### 基数排序
+
+
+
+### 14 排序优化：如何实现一个通用的、高性能的排序函数？
+
+
+
+#### 如何优化快速排序
+
+**最理想的区分点是：**被区分点分开的两个分区中，数据的数量差不多
+
+- 三数取中法
+- 随机法
+
+
+
+### 15 二分查找（上）：如何用最省内存的方式实现快速查找功能
+
+
+
+**二分查找针对的是一个有序的数据集合，查找思想有点类似分治思想。每次都通过跟区间的中间元素对比，将待查找的区间缩小为之前的一半，直到找到要查找的元素，或者区间被缩小为0。**
+
+```java
+public int bsearch(int[] a, int n, int value) {
+    int low = 0;
+    int high = n - 1;
+    while(low <= high) {
+        int mid = (low + high)/2;
+        if(a[mid] == value)
+        	return mid;
+        else if(a[mid] < value)
+        	low = mid + 1；
+        else
+        	high = mid - 1;
+    }
+    return -1;
+}
+```
+
+**容易出错的 3 个地方**
+
+1. 循环退出的条件
+
+   注意是 low <= high ，不是 low < high
+
+2. mid 的取值
+
+   (low + high)/2 是有问题的。如果 low 和 high
+
+    比较大的话，两者之和可能溢出。
+
+   改进： low + (high - low)/2
+
+   ​            low + ((high-low)>>1) 
+
+3. low 和 high 的更新
+
+   low = mid + 1, high = mid -1； 如果直接写成 low = mid 或者 high = mid 就可能发生死循环。
+
+```java
+// 二分查找的递归实现
+public int bsearch(int[] a, int n, int val) {
+  return bsearchInternally(a, 0, n - 1, val);
+}
+
+private int bsearchInternally(int[] a, int low, int high, int value) {
+  if (low > high) return -1;
+
+  int mid =  low + ((high - low) >> 1);
+  if (a[mid] == value) {
+    return mid;
+  } else if (a[mid] < value) {
+    return bsearchInternally(a, mid+1, high, value);
+  } else {
+    return bsearchInternally(a, low, mid-1, value);
+  }
+}
+
+```
+
+
+
+**二分查找应用的局限性**
+
+- 二分查找依赖的是顺序表结构，简单点说就是数组
+- 二分查找针对的是有序数据
+- 数据量太小不适合二分查找
+- 数据量太大也不适合二分查找
+
+
+
+### 16 二分查找（下）：如何快速定位 IP 对应的省份地址？
+
+**四种常见的二分查找变形问题**
+
+- 查找第一个值等于给定值得元素
+- 查找最后一个值等于给定值的元素
+- 查找第一个大于等于给定值的元素
+- 查找最后一个小于等于给定值的元素
+
+
+
+#### 变体一：查找第一个值等于给定值得元素
+
+```java
+public int bsearch(int[] a, int n, int value) {
+  int low = 0;
+  int high = n - 1;
+  while (low <= high) {
+    int mid = low + ((high - low) >> 1);
+    if (a[mid] >= value) {
+      high = mid - 1;
+    } else {
+      low = mid + 1;
+    }
+  }
+
+  if (low < n && a[low]==value) return low;
+  else return -1;
+}
+```
+
+
+
+```java
+public int bsearch(int[] a, int n, int value) {
+  int low = 0;
+  int high = n - 1;
+  while (low <= high) {
+    int mid =  low + ((high - low) >> 1);
+    if (a[mid] > value) {
+      high = mid - 1;
+    } else if (a[mid] < value) {
+      low = mid + 1;
+    } else {
+      if ((mid == 0) || (a[mid - 1] != value)) return mid;
+      else high = mid - 1;
+    }
+  }
+  return -1;
+}
+```
+
+
+
+#### 变体二：查找最后一个值等于给定值的元素
+
+```java
+public int bsearch(int[] a, int n, int value) {
+  int low = 0;
+  int high = n - 1;
+  while (low <= high) {
+    int mid =  low + ((high - low) >> 1);
+    if (a[mid] > value) {
+      high = mid - 1;
+    } else if (a[mid] < value) {
+      low = mid + 1;
+    } else {
+      if ((mid == n - 1) || (a[mid + 1] != value)) return mid;
+      else low = mid + 1;
+    }
+  }
+  return -1;
+}
+```
+
+#### 变体三：查找第一个大于等于给定值的元素
+
+```java
+public int bsearch(int[] a, int n, int value) {
+  int low = 0;
+  int high = n - 1;
+  while (low <= high) {
+    int mid =  low + ((high - low) >> 1);
+    if (a[mid] >= value) {
+      if ((mid == 0) || (a[mid - 1] < value)) return mid;
+      else high = mid - 1;
+    } else {
+      low = mid + 1;
+    }
+  }
+  return -1;
+}
+```
+
+#### 变体四：查找最后一个小于等于给定值的元素
+
+```java
+public int bsearch7(int[] a, int n, int value) {
+  int low = 0;
+  int high = n - 1;
+  while (low <= high) {
+    int mid =  low + ((high - low) >> 1);
+    if (a[mid] > value) {
+      high = mid - 1;
+    } else {
+      if ((mid == n - 1) || (a[mid + 1] > value)) return mid;
+      else low = mid + 1;
+    }
+  }
+  return -1;
+}
+```
+
+
+
+### 17 跳表：为什么 Redis 一定要用跳表来实现有序集合？
+
+**二分查找底层依赖的是数组随机访问的特性，所以只能用数组来实现。** 
+
+
+
+如果数据存储在链表中，没法用二分查找了吗？
+
+**跳表**
+
+动态数据结构，可以支持快速的插入、删除、查找操作。
+
+
+
+Redis 中的有序集合（Sorted Set）就是用跳表实现的。
+
+
+
+**如何理解“跳表”**
+
+链表加多级索引的结构
+
+
+
+### 18 散列表（上）：Word文档中的单词拼写检查功能是如何实现的？
+
+**散列表用的是数组支持按照下标随机访问数据的特性，所以散列表其实就是数组的一种扩展，由数组演化而来。可以说，如果没有数组，就没有散列表。**
+
+#### 散列函数
+
+
+
+**hash(key)**
+
+- 散列函数计算得到的散列值是一个非负整数
+- 如果 key1 = key2, 那 hash(key1) == hash(key2)
+- 如果 key1 != key2, 那 hash(key1) != hash(key2)
+
+
+
+#### 散列冲突
+
+- 开放寻址法
+- 链表法
+
+**1. 开放寻址法**
+
+核心思想：如果出现了散列冲突，我们就重新探测一个空闲位置，将其插入。
+
+**线性探测**
+
+**二次探测**
+
+**双重散列**
+
+**2. 链表法**
+
+### 19 散列表（中）：如何打造一个工业级水平的散列表
+
+
+
+#### 装载因子过大了怎么办？
+
+装载因子越大，说明散列表中的元素越多，空闲位置越少，散列冲突的概率就越大。不仅插入数据的过程要多次寻址或者拉很长的链，查找过程也会因此变得很慢。
+
+**动态扩容**
+
+
+
+#### 如果避免低效扩容？
+
+将扩容操作穿插在插入操作的过程中，分批完成。当装载因子达到阈值时，我们只申请新空间，但并不将老的数据搬移到新散列表中。
+
+
+
+#### 如何选择重入解决方法？
+
+
+
+- Java 中 LinkedHashMap 就是用链表法解决冲突。
+- ThreadLocalMap 使用线性探测的开放寻址法来解决冲突。
+
+1. 开放寻址法
+
+   散列表中的数据都存储在数组中，可以有效的利用CPU缓存加快查询速度。
+
+   序列化比较简单。
+
+   链表法包含指针，序列换就没那么容易。
+
+   删除数据比较麻烦。
+
+   使用开放寻址法解决冲突的散列表，装载因子的上线不能太大。这也导致这种方法比链表法更浪费内存空间。
+
+   **总结，当数据量比较小，装载因子小的时候，适合采用开放寻址法。 Java 中 ThreadLocalMap 使用开放寻址法解决散列冲突的原因。**
+
+2. 链表法
+
+   链表法对内存的利用率比开放寻址法要高。因为链表节点可以在需要的时候再去进行创建，并不需要像开放寻址法那样事先申请好。也是链表优于数组的地方。
+
+   链表法对比开放寻址法，对大装载因子的容忍度更高。开放寻址法只能使用装载因子小于1 的情况。接近 1 时，就可能出现大量的散列冲突，导致大量的探测、再散列等，性能下降。
+
+   对于链表法，只要散列函数的值随机均匀，即使装载因子变成10，也就是链表的长度变长，虽然查询效率下降，但是比顺序查找快。
+
+   **总结，基于链表的散列冲突处理方法比较适合存储大对象、大数据量的散列表，而且，比起开放寻址法，它更加灵活，支持更多的优化策略，比如红黑树代替链表。**
+
+
+
+**HashMap**
+
+- 初始大小
+
+  HashMap 默认的初始大小是 16，这个可以设置。
+
+- 装载因子和动态扩容
+
+  最大装载因子默认是 0.75, 当 HashMap 中元素个数超过 0.75*capacity （capacaity 表示散列表的容量）的时候，就会启动扩容，每次扩容都会扩容为原来的两倍大小。
+
+- 散列冲突解决方法
+
+  HashMap 底层采用链表法解决冲突。
+
+  JDK 1.8 , 对 HashMap 进行了优化，引入了 红黑树。
+
+- 散列函数
+
+  ```java
+  int hash(Object key) {
+      int h = key.hashCode()；
+      return (h ^ (h >>> 16)) & (capitity -1); //capicity 表示散列表的大小
+  }
+  ```
+
+**摘自评论：**
+
+```java
+int hash(Object key) {
+    int h = key.hashCode()；
+    return (h ^ (h >>> 16)) & (capitity -1); //capicity 表示散列表的大小
+}
+
+先补充下老师使用的这段代码的一些问题：在JDK HashMap源码中，是分两步走的：
+1. hash值的计算，源码如下：
+static final int hash(Object key) {
+        int hash;
+        return key == null ? 0 : (hash = key.hashCode()) ^ hash >>> 16;
+ }
+
+2. 在插入或查找的时候，计算Key被映射到桶的位置：
+int index = hash(key) & (capacity - 1)
+
+----------------------------
+JDK HashMap中hash函数的设计，确实很巧妙：
+
+首先hashcode本身是个32位整型值，在系统中，这个值对于不同的对象必须保证唯一（JAVA规范），这也是大家常说的，重写equals必须重写hashcode的重要原因。
+
+获取对象的hashcode以后，先进行移位运算，然后再和自己做异或运算，即：hashcode ^ (hashcode >>> 16)，这一步甚是巧妙，是将高16位移到低16位，这样计算出来的整型值将“具有”高位和低位的性质
+
+最后，用hash表当前的容量减去一，再和刚刚计算出来的整型值做位与运算。进行位与运算，很好理解，是为了计算出数组中的位置。但这里有个问题：
+为什么要用容量减去一？
+因为 A % B = A & (B - 1)，所以，(h ^ (h >>> 16)) & (capitity -1) = (h ^ (h >>> 16)) % capitity，可以看出这里本质上是使用了「除留余数法」
+
+综上，可以看出，hashcode的随机性，加上移位异或算法，得到一个非常随机的hash值，再通过「除留余数法」，得到index，整体的设计过程与老师所说的“散列函数”设计原则非常吻合！
+
+```
+
