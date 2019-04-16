@@ -1361,3 +1361,332 @@ JDK HashMap中hash函数的设计，确实很巧妙：
 
 ```
 
+
+
+### 20 散列表（下）：为什么散列表和链表经常会一起使用？
+
+
+
+- LRU 缓存淘汰算法
+
+  链表实现 时间复杂度O(n)
+
+  通过散列 O(1)
+
+- Redis 有序结合 
+
+  跳表 散列表
+
+- LinkedHashMap 
+
+  散列表 链表
+
+
+
+#### **LRU 缓存淘汰算法**
+
+- 向缓存中添加一个数据
+- 向缓存中删除一个数据
+- 在缓存中查找一个数据
+
+![eaefd5f4028cc7d4cfbb56b24ce8ae6e](./eaefd5f4028cc7d4cfbb56b24ce8ae6e.jpg)
+
+使用双向链表存储数据，链表中的每个节点处理存储数据、前驱指针、后驱指针之外，还有一个字段hnext。
+
+**hnext 指针是为了将节点串在散列表的拉链中**
+
+#### **Redis 有序集合**
+
+**key**
+
+**score**
+
+
+
+#### **Java LinkedHashMap**
+
+```java
+HashMap<Integer, Integer> m = new LinkedHashMap<>();
+m.put(3, 11);
+m.put(1, 12);
+m.put(5, 23);
+m.put(2, 22);
+
+for (Map.Entry e : m.entrySet()) {
+  System.out.println(e.getKey());
+}
+```
+
+打印的顺序就是 3，1，5，2
+
+```java
+// 10 是初始大小，0.75 是装载因子，true 是表示按照访问时间排序
+HashMap<Integer, Integer> m = new LinkedHashMap<>(10, 0.75f, true);
+m.put(3, 11);
+m.put(1, 12);
+m.put(5, 23);
+m.put(2, 22);
+
+m.put(3, 26);
+m.get(5);
+
+for (Map.Entry e : m.entrySet()) {
+  System.out.println(e.getKey());
+}
+```
+
+这段代码打印的结果是 1，2，3，5
+
+**LinkedHashMap 是通过双向链表和散列表这两种数据结构组合实现的。LinkedHashMap 中的“Linked”实际上是指的是双向链表，并非指用链表法解决散列冲突**
+
+
+
+### 21 哈希算法（上）：如何防止数据库中的用户信被脱库
+
+
+
+哈希算法：将任意长度的二进制值串映射为固定长度的二进制值串，这个映射的规则就是哈斯算法。
+
+
+
+哈希算法的应用：
+
+- 安全加密
+- 唯一标识
+- 数据校验
+- 散列函数
+- 负载均衡
+- 数据分片
+- 分布式存储
+
+#### **应用一：安全加密**
+
+**MD5** **SHA**
+
+**DES** **AES**
+
+- 很难根据哈希值反向推导出原始数据
+- 散列冲突的概率很小
+
+
+
+#### **应用二：唯一标识**
+
+#### **应用三：数据校验**
+
+#### **应用四：散列函数**
+
+
+
+### 22 哈希算法（下）：哈希算法在分布式系统中有哪些应用？
+
+
+
+#### **应用五：负载均衡**
+
+- 轮询
+- 随机
+- 加权轮询
+
+
+
+#### **应用六：数据分片**
+
+- 如何统计“搜索关键词”出现的次数
+- 如何快速判断如偏是否在图库中
+
+#### **应用七：分布式存储**
+
+
+
+### 23 二叉树基础（上）：什么样的二叉树适合用数组来存储？
+
+
+
+#### **树（Tree）**
+
+- 高度
+- 深度
+- 层
+
+#### **二叉树（Binary Tree）**
+
+- 左子节点
+- 右子节点
+
+
+
+- 满二叉树
+- 完全二叉树
+
+存储二叉树
+
+- 基于指针或者应用的二叉树式存储法
+- 基于数组的顺序存储法
+
+如果某颗二叉树是一颗完全二叉树，那用数组存储无疑就是最节省内存的一种方式。
+
+堆就是一种完全二叉树，最常用的存储方式就是数组。
+
+
+
+#### **二叉树的遍历**
+
+- 前序遍历
+
+  对于树中的任意节点来说，先打印这个节点，然后再打印它的左子树，最后打印它的右子树
+
+- 中序遍历
+
+  对于树中的任意节点来说，先打印它的左子树，然后再打印这个节点，最后打印它的右子树
+
+- 后序遍历
+
+  对于树中的任意节点来说，先打印它的左子树，然后再打印它的右子树，最后打印这个节点
+
+![ab103822e75b5b15c615b68560cb2416](./ab103822e75b5b15c615b68560cb2416.jpg)
+
+
+
+```C++
+前序遍历的递推公式：
+preOrder(r) = print r->preOrder(r->left)->preOrder(r->right)
+
+中序遍历的递推公式：
+inOrder(r) = inOrder(r->left)->print r->inOrder(r->right)
+
+后序遍历的递推公式：
+postOrder(r) = postOrder(r->left)->postOrder(r->right)->print r
+```
+
+er'cha
+
+```C++
+void preOrder(Node* root) {
+  if (root == null) return;
+  print root // 此处为伪代码，表示打印 root 节点
+  preOrder(root->left);
+  preOrder(root->right);
+}
+
+void inOrder(Node* root) {
+  if (root == null) return;
+  inOrder(root->left);
+  print root // 此处为伪代码，表示打印 root 节点
+  inOrder(root->right);
+}
+
+void postOrder(Node* root) {
+  if (root == null) return;
+  postOrder(root->left);
+  postOrder(root->right);
+  print root // 此处为伪代码，表示打印 root 节点
+}
+```
+
+二叉树遍历的时间复杂度是 O(n)
+
+
+
+### 24 二叉树基础（下）：有了如此高效的散列表，为什么还需要二叉树？
+
+二叉查找树
+
+支持动态数据集合的快速插入、删除、查找操作。
+
+#### 二叉查找树（Binary Search Tree）
+
+**二叉查找树的查找操作**
+
+```java
+public class BinarySearchTree {
+  private Node tree;
+
+  public Node find(int data) {
+    Node p = tree;
+    while (p != null) {
+      if (data < p.data) p = p.left;
+      else if (data > p.data) p = p.right;
+      else return p;
+    }
+    return null;
+  }
+
+  public static class Node {
+    private int data;
+    private Node left;
+    private Node right;
+
+    public Node(int data) {
+      this.data = data;
+    }
+  }
+}
+```
+
+**二叉查找树的插入操作**
+
+```java
+public void insert(int data) {
+  if (tree == null) {
+    tree = new Node(data);
+    return;
+  }
+
+  Node p = tree;
+  while (p != null) {
+    if (data > p.data) {
+      if (p.right == null) {
+        p.right = new Node(data);
+        return;
+      }
+      p = p.right;
+    } else { // data < p.data
+      if (p.left == null) {
+        p.left = new Node(data);
+        return;
+      }
+      p = p.left;
+    }
+  }
+}
+```
+
+**二叉查找树的删除操作**
+
+```java
+public void delete(int data) {
+  Node p = tree; // p 指向要删除的节点，初始化指向根节点
+  Node pp = null; // pp 记录的是 p 的父节点
+  while (p != null && p.data != data) {
+    pp = p;
+    if (data > p.data) p = p.right;
+    else p = p.left;
+  }
+  if (p == null) return; // 没有找到
+
+  // 要删除的节点有两个子节点
+  if (p.left != null && p.right != null) { // 查找右子树中最小节点
+    Node minP = p.right;
+    Node minPP = p; // minPP 表示 minP 的父节点
+    while (minP.left != null) {
+      minPP = minP;
+      minP = minP.left;
+    }
+    p.data = minP.data; // 将 minP 的数据替换到 p 中
+    p = minP; // 下面就变成了删除 minP 了
+    pp = minPP;
+  }
+
+  // 删除节点是叶子节点或者仅有一个子节点
+  Node child; // p 的子节点
+  if (p.left != null) child = p.left;
+  else if (p.right != null) child = p.right;
+  else child = null;
+
+  if (pp == null) tree = child; // 删除的是根节点
+  else if (pp.left == p) pp.left = child;
+  else pp.right = child;
+}
+```
+
