@@ -30,18 +30,18 @@ public class TestArrayList {
 
     // 往 List 添加Integer时，需要不停的拆箱、封箱操作，效率变低。 但是不明白为什么这里 效率是反过来的？
     public static void testInteger() {
-        long st = System.currentTimeMillis();
-        List<Integer> list = new ArrayList<>(10000000);
-        for (int i = 0; i < 10000000; ++i) {
-            list.add(i);
-        }
-        System.out.println("Test1: " + (System.currentTimeMillis() - st));
         long s1 = System.currentTimeMillis();
         List<Integer> list1 = new ArrayList<>();
         for (int i = 0; i < 10000000; ++i) {
             list1.add(i);
         }
         System.out.println("Test2: " + (System.currentTimeMillis() - s1));
+        long st = System.currentTimeMillis();
+        List<Integer> list = new ArrayList<>(10000000);
+        for (int i = 0; i < 10000000; ++i) {
+            list.add(i);
+        }
+        System.out.println("Test1: " + (System.currentTimeMillis() - st));
     }
 
 }
