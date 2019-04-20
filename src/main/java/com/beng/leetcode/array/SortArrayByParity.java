@@ -1,6 +1,7 @@
 package com.beng.leetcode.array;
 
 /*
+ * https://leetcode-cn.com/problems/sort-array-by-parity/
  * 给定一个非负整数数组 A，返回一个由 A 的所有偶数元素组成的数组，后面跟 A 的所有奇数元素。
 你可以返回满足此条件的任何数组作为答案。
 示例：
