@@ -1,5 +1,10 @@
 package com.beng.stack;
 
+/**
+ * 用数组实现栈
+ * 
+ * @author apple
+ */
 public class MyStack {
 
     private String[] stack; // 栈
@@ -22,7 +27,6 @@ public class MyStack {
     }
 
     public String pop() {
-
         if (count == 0) {
             return null;
         }
