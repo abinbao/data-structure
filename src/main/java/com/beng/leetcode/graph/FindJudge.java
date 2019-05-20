@@ -13,8 +13,8 @@ import java.util.Map.Entry;
 public class FindJudge {
 
     public static int findJudge(int N, int[][] trust) {
-        Map<Integer, Integer> output = new HashMap<>();
-        Map<Integer, Integer> input = new HashMap<>();
+        Map<Integer, Integer> output = new HashMap<>(); // 出度
+        Map<Integer, Integer> input = new HashMap<>(); // 入度
 
         for (int n = 1; n <= N; ++n) {
             output.put(n, 0);
